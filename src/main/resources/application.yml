@@ -1,0 +1,39 @@
+# Default profile: in-memory H2 database (PostgreSQL mode) so the service runs with no setup.
+spring:
+  application:
+    name: accounts-payable-service
+  datasource:
+    url: jdbc:h2:mem:ap;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  flyway:
+    locations: classpath:db/migration
+  graphql:
+    graphiql:
+      enabled: true
+
+app:
+  seed-demo-data: true
+  # Demo users for local development only. Override with environment variables in any real deployment.
+  users:
+    clerk-password: ${AP_CLERK_PASSWORD:clerk-pass}
+    approver-password: ${AP_APPROVER_PASSWORD:approver-pass}
+    treasury-password: ${AP_TREASURY_PASSWORD:treasury-pass}
+    supervisor-password: ${AP_SUPERVISOR_PASSWORD:supervisor-pass}
+
+---
+# PostgreSQL profile: real database plus the ap_aging_report stored function.
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ap}
+    username: ${DB_USER:ap}
+    password: ${DB_PASSWORD:ap}
+  flyway:
+    locations: classpath:db/migration,classpath:db/postgres

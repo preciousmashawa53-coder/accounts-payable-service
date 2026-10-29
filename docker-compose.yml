@@ -1,0 +1,27 @@
+# Runs the service with PostgreSQL (uses the ap_aging_report stored function).
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ap
+      POSTGRES_USER: ap
+      POSTGRES_PASSWORD: ap
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ap -d ap"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://db:5432/ap
+      DB_USER: ap
+      DB_PASSWORD: ap
+    ports:
+      - "8080:8080"

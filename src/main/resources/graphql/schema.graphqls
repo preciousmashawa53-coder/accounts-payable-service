@@ -1,0 +1,53 @@
+# Read-only GraphQL view of the accounts payable ledger.
+# Write operations go through the REST API, where each step is checked against role and business rules.
+
+type Query {
+    suppliers: [Supplier!]!
+    invoices(status: String): [Invoice!]!
+    invoice(id: ID!): Invoice
+    payments(invoiceId: ID!): [Payment!]!
+    agingReport(asOf: String): [AgingRow!]!
+}
+
+type Supplier {
+    id: ID!
+    code: String!
+    name: String!
+    email: String
+}
+
+type Invoice {
+    id: ID!
+    supplierCode: String!
+    supplierName: String!
+    invoiceNumber: String!
+    poNumber: String
+    invoiceDate: String!
+    dueDate: String!
+    amount: Float!
+    amountPaid: Float!
+    outstanding: Float!
+    status: String!
+    capturedBy: String!
+    approvedBy: String
+}
+
+type Payment {
+    id: ID!
+    invoiceId: ID!
+    amount: Float!
+    paymentDate: String!
+    reference: String!
+    paidBy: String!
+}
+
+type AgingRow {
+    supplierCode: String!
+    supplierName: String!
+    current: Float!
+    days1To30: Float!
+    days31To60: Float!
+    days61To90: Float!
+    over90: Float!
+    total: Float!
+}
